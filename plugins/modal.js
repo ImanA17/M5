@@ -31,19 +31,18 @@ function _createModalFooter(buttons=[]){
 
 
 function _createModal(options){
-    const DEFAULT_WIDTH = '600px'
+    const DEFAULT_WIDTH = '400px'
     const modal = document.createElement("div");
     modal.classList.add('gmodal');
     modal.insertAdjacentHTML("beforeend", `
         <div class="modal-overlay" data-close="true">
             <div class="modal-window" style = "width: ${options.width || DEFAULT_WIDTH}">
                 <div class="modal-header">
-                    <span class = "modal-title">${options.title || 'Window'}</span>
-                    ${options.closable ? `<span class = "modal-close" data-close="true">&times;</span>` : ''}
+                    <span class = "modal-title" data-title><strong>${options.title || 'Window'}</strong></span>
+                    ${ (options.closable || false ) ? 
+                        `<span class = "modal-close" data-close="true">&times;</span>` : ''}
                 </div>
-                <div class="modal-body" data-content>
-                    ${options.content || ''}
-                </div>
+                <div class="modal-body" data-content>${options.content || ''}</div>
             </div>        
         </div>
     `) 
@@ -95,6 +94,9 @@ $.modal = function(options){
             setTimeout(()=> {
                 $modal.classList.remove('hide');
                 closing = false;
+                if(typeof options.onClose === 'function')
+                    options.onClose();
+
             },ANIMATION_SPEED)
         }
     }
@@ -110,13 +112,13 @@ $.modal = function(options){
 
     return Object.assign(modalObj, {
         destroy() {
-            $modal.removeEventListener(close_listener);
+            $modal.removeEventListener('click', close_listener);
             $modal.parentNode.removeChild($modal)
             destroyed = true;
         },
         setContent(html){
-            $modal.querySelector('[data-giorgi]').innerHTML = html;
-        }
+            $modal.querySelector('[data-content]').innerHTML = html;
+        },
 
 
     });
